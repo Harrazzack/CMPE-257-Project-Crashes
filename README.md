@@ -35,6 +35,6 @@ You need to have python installed
 Try installing conda for the python environement. 
 Once it is installed we have a yml file that you can run the command `conda env create -f environment.yml` to create the specified environemnt for this project. Then activate the environment by running `conda activate conda257`
 
-
+After installing more dependancies/packages with your branch, export the environment to the yml file: `conda env export --from-history --no-builds > environment.yml`
 
 We will attempt to predict the most dangerous intersections in San Jose and thus identify risk.
