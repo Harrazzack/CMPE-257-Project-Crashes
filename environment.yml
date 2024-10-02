@@ -2,11 +2,12 @@ name: conda257
 channels:
   - defaults
 dependencies:
-  - python=3.11
+  - folium
   - ipykernel
-  - plotly
   - numpy
   - pandas
-  - folium
-  - seaborn
+  - plotly
+  - python=3.11
   - scikit-learn
+  - seaborn
+  - tensorflow
