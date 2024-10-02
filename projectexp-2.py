@@ -83,8 +83,6 @@ for i in range(sample_size):
 # Show the map
 accident_map
 
-
-
 # Visualization 5: Top Crash Factors
 plt.figure(figsize=(10, 6))
 top_factors = dfv['ViolationCodeDescription'].value_counts().head(10)
