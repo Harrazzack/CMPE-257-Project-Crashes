@@ -27,19 +27,14 @@
 ### Project Constraints:
 
 ## Setup
+## Dev Environment 
+### Cloning 
+You can clone the repo using the `git clone` command on your terminal followed by our repo link 
+### Installation
+You need to have python installed
+Try installing conda for the python environement. 
+Once it is installed we have a yml file that you can run the command `conda env create -f environment.yml` to create the specified environemnt for this project. Then activate the environment by running `conda activate conda257`
 
-### Project Dependencies:
 
-### Project Environment:
-
-### Project Configuration:
-
-### Project Installation:
-
-### Project Usage:
-
-### Project Testing:
-
-### Project Deployment:
 
 We will attempt to predict the most dangerous intersections in San Jose and thus identify risk.
