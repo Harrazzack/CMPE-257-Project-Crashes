@@ -83,6 +83,127 @@ for i in range(sample_size):
 # Show the map
 accident_map
 
+from folium.plugins import HeatMap
+
+
+# Group the data by Latitude and Longitude, and count the number of accidents at each location
+# We assume dfc contains accident data with 'Latitude' and 'Longitude' columns.
+location_accident_count = dfc.groupby(['Latitude', 'Longitude']).size().reset_index(name='count')
+
+# Filter out rows where Latitude or Longitude are NaN
+location_accident_count = location_accident_count.dropna(subset=['Latitude', 'Longitude'])
+
+# Prepare the data for the heatmap (latitude, longitude, weight)
+heat_data = [[row['Latitude'], row['Longitude'], row['count']] for index, row in location_accident_count.iterrows()]
+
+# Create a folium map centered on San Jose
+accident_map = folium.Map(location=[37.3382, -121.8863], zoom_start=12)
+
+# Add the heatmap to the map
+HeatMap(heat_data).add_to(accident_map)
+
+# Show the map
+accident_map
+
+
+ # Group the data by Latitude and Longitude, and count the number of accidents at each location
+location_accident_count = dfc.groupby(['Latitude', 'Longitude']).size().reset_index(name='count')
+
+# Filter out rows where Latitude or Longitude are NaN
+location_accident_count = location_accident_count.dropna(subset=['Latitude', 'Longitude'])
+
+# Define risk categories based on the accident count thresholds
+def classify_risk(count):
+    if count >= 10:  # Define high risk as 10 or more accidents
+        return 'high'
+    elif count >= 5:  # Define medium risk as 5-9 accidents
+        return 'medium'
+    else:  # Define low risk as fewer than 5 accidents
+        return 'low'
+
+# Apply the risk classification
+location_accident_count['risk'] = location_accident_count['count'].apply(classify_risk)
+
+# Create a folium map centered on San Jose
+accident_map = folium.Map(location=[37.3382, -121.8863], zoom_start=12)
+
+# Function to choose color based on risk level
+def get_color(risk):
+    if risk == 'high':
+        return 'red'
+    elif risk == 'medium':
+        return 'orange'
+    else:
+        return 'green'
+
+# Add Circle Markers for each location based on the risk level
+for _, row in location_accident_count.iterrows():
+    lat, lon, risk = row['Latitude'], row['Longitude'], row['risk']
+    folium.CircleMarker(
+        location=[lat, lon],
+        radius=6,
+        color=get_color(risk),
+        fill=True,
+        fill_color=get_color(risk),
+        fill_opacity=0.6,
+        popup=f'Risk: {risk}, Accidents: {row["count"]}'
+    ).add_to(accident_map)
+
+# Show the map
+accident_map
+
+
+
+# Group the data by Latitude and Longitude, and count the number of accidents at each location
+location_accident_count = dfc.groupby(['Latitude', 'Longitude']).size().reset_index(name='count')
+
+# Filter out rows where Latitude or Longitude are NaN
+location_accident_count = location_accident_count.dropna(subset=['Latitude', 'Longitude'])
+
+# Define risk categories based on the accident count thresholds
+def classify_risk(count):
+    if count >= 10:  # Define high risk as 10 or more accidents
+        return 'high'
+    elif count >= 5:  # Define medium risk as 5-9 accidents
+        return 'medium'
+    else:  # Define low risk as fewer than 5 accidents
+        return 'low'
+
+# Apply the risk classification
+location_accident_count['risk'] = location_accident_count['count'].apply(classify_risk)
+
+# Filter out low-risk locations
+filtered_data = location_accident_count[location_accident_count['risk'].isin(['medium', 'high'])]
+
+# Create a folium map centered on San Jose
+accident_map = folium.Map(location=[37.3382, -121.8863], zoom_start=12)
+
+# Function to choose color based on risk level
+def get_color(risk):
+    if risk == 'high':
+        return 'red'
+    elif risk == 'medium':
+        return 'orange'
+
+# Add Circle Markers for medium and high-risk locations
+for _, row in filtered_data.iterrows():
+    lat, lon, risk = row['Latitude'], row['Longitude'], row['risk']
+    folium.CircleMarker(
+        location=[lat, lon],
+        radius=6,
+        color=get_color(risk),
+        fill=True,
+        fill_color=get_color(risk),
+        fill_opacity=0.6,
+        popup=f'Risk: {risk}, Accidents: {row["count"]}'
+    ).add_to(accident_map)
+
+# Show the map
+accident_map
+
+
+
+
 # Visualization 5: Top Crash Factors
 plt.figure(figsize=(10, 6))
 top_factors = dfv['ViolationCodeDescription'].value_counts().head(10)
