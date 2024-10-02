@@ -15,15 +15,16 @@ from sklearn.metrics import accuracy_score
 
 # prompt: add the google drive datset files
 
-from google.colab import drive
-drive.mount('/content/drive')
-
 # Load the datasets into pandas dataframes
-dfc = pd.read_csv("/content/drive/Shareddrives/CMPE-257/crashes.csv")
-dfv = pd.read_csv("/content/drive/Shareddrives/CMPE-257/vehicles.csv")
+dfc = pd.read_csv("./data/crashes.csv")
+dfv = pd.read_csv('./data/vehicles.csv')
 
 # Display the first few rows and info for initial inspection
+print("Crashes Data Info:")
 dfc_info = dfc.info()
+
+
+print("Vehicles Data Info:")
 # Display the first few rows and info for initial inspection
 dfv_info = dfv.info()
 
@@ -39,6 +40,8 @@ import plotly.express as px
 dfc.fillna(0, inplace=True)
 
 dfv.fillna(0, inplace=True)
+
+
 
 """# Basic EDA
 
@@ -59,34 +62,32 @@ plt.xlabel('Severity')
 plt.xticks(rotation=45)
 plt.show()
 
-# Visualization 2: Age Distribution of Drivers Involved in Accidents
-plt.figure(figsize=(8, 6))
-sns.histplot(dfc['Age'], bins=30, kde=True, color='blue')
-plt.title('Age Distribution of Drivers Involved in Accidents')
-plt.xlabel('Age')
-plt.ylabel('Frequency')
-plt.show()
+dfc.columns
 
-# Visualization 3: Accident Hotspots on a Map (using dfv, which contains Latitude and Longitude)
-# Only plot a small sample for visualization purposes
-sample_size = 500
-accident_map = folium.Map(location=[37.3382, -121.8863], zoom_start=12)  # Centered on San Jose
+import folium
 
+# Set the sample size (ensure it's less than or equal to the total available rows)
+sample_size = min(500, dfc.shape[0])  # Ensure we don't exceed the dataset size
+
+# Create a folium map centered on San Jose
+accident_map = folium.Map(location=[37.3382, -121.8863], zoom_start=12)
+
+# Loop through the sampled data
 for i in range(sample_size):
-    lat, lon = dfv['Latitude'].iloc[i], dfv['Longitude'].iloc[i]
-    folium.CircleMarker([lat, lon], radius=2, color='red', fill=True).add_to(accident_map)
+    lat, lon = dfc['Latitude'].iloc[i], dfc['Longitude'].iloc[i]
 
-# Visualization 4: Injury Severity by Age Group (boxplot)
-plt.figure(figsize=(10, 6))
-sns.boxplot(x='Age', y='FatalInjuries', data=dfc)
-plt.title('Injury Severity by Age Group')
-plt.ylabel('Fatal Injuries')
-plt.xticks(rotation=45)
-plt.show()
+    # Ensure latitude and longitude are valid (not NaN)
+    if pd.notna(lat) and pd.notna(lon):
+        folium.CircleMarker([lat, lon], radius=2, color='red', fill=True).add_to(accident_map)
+
+# Show the map
+accident_map
+
+
 
 # Visualization 5: Top Crash Factors
 plt.figure(figsize=(10, 6))
-top_factors = dfc['ViolationCodeDescription'].value_counts().head(10)
+top_factors = dfv['ViolationCodeDescription'].value_counts().head(10)
 top_factors.plot(kind='bar', color='purple')
 plt.title('Top 10 Crash Factors')
 plt.ylabel('Count')
@@ -96,7 +97,7 @@ plt.show()
 
 # Visualization 6: Accidents Involving Speeding
 plt.figure(figsize=(6, 6))
-speeding_flag = dfv['SpeedingFlag'].value_counts()
+speeding_flag = dfc['SpeedingFlag'].value_counts()
 speeding_flag.plot(kind='pie', autopct='%1.1f%%', colors=['lightblue', 'orange'], startangle=90)
 plt.title('Accidents Involving Speeding')
 plt.ylabel('')
@@ -104,7 +105,7 @@ plt.show()
 
 # Visualization 7: Crash Severity by Vehicle Count
 plt.figure(figsize=(10, 6))
-sns.barplot(x='VehicleCount', y='FatalInjuries', data=dfc, ci=None, palette='coolwarm')
+sns.barplot(x='VehicleCount', y='FatalInjuries', data=dfv, ci=None, palette='coolwarm')
 plt.title('Crash Severity by Vehicle Count')
 plt.ylabel('Fatal Injuries')
 plt.xlabel('Vehicle Count')
@@ -113,7 +114,7 @@ plt.show()
 
 # Visualization 8: Hit-and-Run Incidents
 plt.figure(figsize=(6, 6))
-hit_and_run = dfv['HitAndRunFlag'].value_counts()
+hit_and_run = dfc['HitAndRunFlag'].value_counts()
 hit_and_run.plot(kind='pie', autopct='%1.1f%%', colors=['lightgreen', 'red'], startangle=90)
 plt.title('Hit-and-Run Incidents')
 plt.ylabel('')
@@ -121,10 +122,9 @@ plt.show()
 
 # Visualization 9: Injury Severity by Vehicle Make
 plt.figure(figsize=(12, 6))
-sns.boxplot(x='VehicleMakeModelType', y='FatalInjuries', data=dfc, showfliers=False)
+sns.boxplot(x='VehicleMakeModelType', y='FatalInjuries', data=dfv, showfliers=False)
 plt.title('Injury Severity by Vehicle Make')
 plt.ylabel('Fatal Injuries')
 plt.xlabel('Vehicle Make')
 plt.xticks(rotation=90)
 plt.show()
-
