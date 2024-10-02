@@ -10,3 +10,5 @@ dependencies:
   - folium
   - seaborn
   - scikit-learn
+  - pytorch
+prefix: /opt/anaconda3/envs/conda257
